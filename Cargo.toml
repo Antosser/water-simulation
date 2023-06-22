@@ -2,6 +2,8 @@
 name = "water-simulation"
 version = "0.1.1"
 edition = "2021"
+description = "A water simulation written in Rust"
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
