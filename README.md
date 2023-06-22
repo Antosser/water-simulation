@@ -36,3 +36,12 @@ Options:
 ## Requirements
 1. ffmpeg in path
 2. cargo if you want to build yourself
+
+## Installation using GitHub Releases
+1. Download the executable
+2. Run it with the image as an argument
+
+## Installation using Cargo
+1. Install cargo (Rust)
+2. Run `cargo install water-simulation`
+3. Run `water-simulation your_file.png`
