@@ -29,6 +29,10 @@ struct Args {
     /// Framerate of the output video
     #[clap(short, long, default_value = "30")]
     framerate: u32,
+
+    /// Extension of the output video
+    #[clap(short, long, default_value = "mov")]
+    extension: String,
 }
 
 fn main() {
@@ -182,7 +186,7 @@ fn main() {
             "images/%04d.png",
             "-vf",
             "scale=1000x1000:flags=neighbor",
-            "output.mp4",
+            format!("output.{}", args.extension).as_str(),
         ])
         .output()
         .expect("Failed to run ffmpeg");
