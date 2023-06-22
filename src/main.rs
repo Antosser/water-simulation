@@ -31,7 +31,7 @@ struct Args {
     framerate: u32,
 
     /// Name of the output video
-    #[clap(short, long, default_value = "out.mov")]
+    #[clap(short = 'n', long, default_value = "out.mov")]
     filename: String,
 }
 
