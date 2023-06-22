@@ -1,5 +1,5 @@
 use clap::Parser;
-use image::Rgb;
+use image::{Rgb, Rgba};
 use log::{info, warn};
 use std::{path::PathBuf, process::Command};
 
@@ -15,6 +15,20 @@ impl Cell {
             Rgb([0, 0, 255]) => Some(Self::Water),
             Rgb([255, 255, 255]) => Some(Self::Air),
             _ => None,
+        }
+    }
+
+    pub fn from_pixel_approximate(pixel: &Rgb<u8>) -> Option<Self> {
+        match pixel {
+            Rgb([0, 0, 0]) => Some(Self::Wall),
+            Rgb([0, 0, 255]) => Some(Self::Water),
+            Rgb([r, g, b]) => {
+                if *r < 150 && *g < 150 && *b < 150 {
+                    Some(Self::Wall)
+                } else {
+                    None
+                }
+            }
         }
     }
 }
@@ -33,28 +47,44 @@ struct Args {
     /// Name of the output video
     #[clap(short = 'n', long, default_value = "out.mov")]
     filename: String,
+
+    /// Whether to use the approximate algorithm (gray will be treated as wall)
+    #[clap(short, long)]
+    approximate: bool,
+
+    /// Whether to convert image to simplest form
+    #[clap(short, long)]
+    debug: bool,
 }
 
 fn main() {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
-    let args = Args::parse();
-    let mut image = image::open(args.image).expect("Failed to open image");
-    let rgb = image
-        .as_mut_rgb8()
-        .expect("Failed to convert image to RGB8");
+    let mut args = Args::parse();
+    let image = image::open(args.image).expect("Failed to open image");
+    let mut rgb = image.to_rgb8();
 
     if PathBuf::from("images").exists() {
         std::fs::remove_dir_all("images").expect("Failed to remove images directory");
     }
     std::fs::create_dir_all("images").expect("Failed to create images directory");
 
-    for x in 0..rgb.width() {
-        for y in 0..rgb.height() {
-            let pixel = rgb.get_pixel_mut(x, y);
-            if Cell::from_pixel(pixel).is_none() {
-                warn!("Unknown pixel at ({}, {}): {:?}", x, y, pixel);
-            };
+    if args.debug {
+        for x in 0..rgb.width() {
+            for y in 0..rgb.height() {
+                let pixel = rgb.get_pixel_mut(x, y);
+
+                match match args.approximate {
+                    true => Cell::from_pixel_approximate(pixel).unwrap_or(Cell::Air),
+                    false => Cell::from_pixel(pixel).unwrap_or(Cell::Air),
+                } {
+                    Cell::Wall => *pixel = Rgb([0, 0, 0]),
+                    Cell::Water => *pixel = Rgb([0, 0, 255]),
+                    Cell::Air => *pixel = Rgb([255, 255, 255]),
+                }
+            }
         }
+
+        args.approximate = false;
     }
 
     std::thread::scope(|thread_scope| {
@@ -68,7 +98,10 @@ fn main() {
 
                     for x in 0..rgb.width() {
                         let pixel = rgb.get_pixel(x, y);
-                        let cell = Cell::from_pixel(pixel).unwrap_or(Cell::Air);
+                        let cell = match args.approximate {
+                            true => Cell::from_pixel_approximate(pixel).unwrap_or(Cell::Air),
+                            false => Cell::from_pixel(pixel).unwrap_or(Cell::Air),
+                        };
 
                         if let Cell::Water = cell {
                             water_coords.push((x, y));
@@ -82,7 +115,10 @@ fn main() {
                         let below = (water_coord.0, water_coord.1 + 1);
                         if below.1 < rgb.height() {
                             let pixel = rgb.get_pixel(below.0, below.1);
-                            let cell = Cell::from_pixel(pixel).unwrap_or(Cell::Air);
+                            let cell = match args.approximate {
+                                true => Cell::from_pixel_approximate(pixel).unwrap_or(Cell::Air),
+                                false => Cell::from_pixel(pixel).unwrap_or(Cell::Air),
+                            };
 
                             if let Cell::Air = cell {
                                 rgb.put_pixel(below.0, below.1, Rgb([0, 0, 255]));
@@ -105,7 +141,12 @@ fn main() {
                             let left = (water_coord.0 - 1, water_coord.1);
                             if left.0 < rgb.width() {
                                 let pixel = rgb.get_pixel(left.0, left.1);
-                                let cell = Cell::from_pixel(pixel).unwrap_or(Cell::Air);
+                                let cell = match args.approximate {
+                                    true => {
+                                        Cell::from_pixel_approximate(pixel).unwrap_or(Cell::Air)
+                                    }
+                                    false => Cell::from_pixel(pixel).unwrap_or(Cell::Air),
+                                };
 
                                 if let Cell::Air = cell {
                                     rgb.put_pixel(left.0, left.1, Rgb([0, 0, 255]));
@@ -117,7 +158,10 @@ fn main() {
                         let right = (water_coord.0 + 1, water_coord.1);
                         if right.0 < rgb.width() {
                             let pixel = rgb.get_pixel(right.0, right.1);
-                            let cell = Cell::from_pixel(pixel).unwrap_or(Cell::Air);
+                            let cell = match args.approximate {
+                                true => Cell::from_pixel_approximate(pixel).unwrap_or(Cell::Air),
+                                false => Cell::from_pixel(pixel).unwrap_or(Cell::Air),
+                            };
 
                             if let Cell::Air = cell {
                                 rgb.put_pixel(right.0, right.1, Rgb([0, 0, 255]));
@@ -140,7 +184,10 @@ fn main() {
                         let above = (water_coord.0, water_coord.1 - 1);
                         if above.1 < rgb.height() {
                             let pixel = rgb.get_pixel(above.0, above.1);
-                            let cell = Cell::from_pixel(pixel).unwrap_or(Cell::Air);
+                            let cell = match args.approximate {
+                                true => Cell::from_pixel_approximate(pixel).unwrap_or(Cell::Air),
+                                false => Cell::from_pixel(pixel).unwrap_or(Cell::Air),
+                            };
 
                             if let Cell::Air = cell {
                                 rgb.put_pixel(above.0, above.1, Rgb([0, 0, 255]));
