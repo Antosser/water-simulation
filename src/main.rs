@@ -1,6 +1,6 @@
 use clap::Parser;
-use image::{Rgb, Rgba};
-use log::{info, warn};
+use image::Rgb;
+use log::info;
 use std::{path::PathBuf, process::Command};
 
 enum Cell {
