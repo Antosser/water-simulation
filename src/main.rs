@@ -180,6 +180,7 @@ fn main() {
     // ffmpeg -framerate 30 -i images/%04d.png -vf scale=1000x1000:flags=neighbor output.mp4
     Command::new("ffmpeg")
         .args([
+            "-y",
             "-framerate",
             args.framerate.to_string().as_str(),
             "-i",
