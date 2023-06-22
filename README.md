@@ -25,3 +25,12 @@ Options:
   -h, --help                   Print help
   -V, --version                Print version
 ```
+
+## Image
+* Black (0, 0, 0) = wall
+* Blue (0, 0, 255) = water
+* Anything else = air
+
+## Requirements
+1. ffmpeg in path
+2. cargo if you want to build yourself
