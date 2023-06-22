@@ -21,7 +21,7 @@ Arguments:
 
 Options:
   -f, --framerate <FRAMERATE>  Framerate of the output video [default: 30]
-  -e, --extension <EXTENSION>  Extension of the output video [default: mov]
+  -n, --filename <FILENAME>    Name of the output video [default: out.mov]
   -h, --help                   Print help
   -V, --version                Print version
 ```
