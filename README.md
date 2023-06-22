@@ -25,3 +25,7 @@ Options:
   -h, --help                   Print help
   -V, --version                Print version
 ```
+
+## Requirements
+1. ffmpeg in path
+2. cargo if you want to build yourself
