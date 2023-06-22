@@ -12,7 +12,7 @@ https://github.com/Antosser/water-simulation/assets/71790328/ba4ef345-304a-4b1a-
 
 ## Usage
 ```
-Simulates the flow of water
+A water simulation written in Rust
 
 Usage: water-simulation.exe [OPTIONS] <IMAGE>
 
@@ -22,6 +22,8 @@ Arguments:
 Options:
   -f, --framerate <FRAMERATE>  Framerate of the output video [default: 30]
   -n, --filename <FILENAME>    Name of the output video [default: out.mov]
+  -a, --approximate            Whether to use the approximate algorithm (gray will be treated as wall)
+  -d, --debug                  Whether to convert image to simplest form
   -h, --help                   Print help
   -V, --version                Print version
 ```
