@@ -58,10 +58,12 @@ fn main() {
     }
 
     std::thread::scope(|thread_scope| {
+        let mut cached_max_y = rgb.height();
+
         'frames: for frame in 1.. {
             'checks: {
                 info!("Frame {}", frame);
-                for y in (0..rgb.height()).rev() {
+                for y in (0..cached_max_y).rev() {
                     let mut water_coords = vec![];
 
                     for x in 0..rgb.width() {
@@ -90,6 +92,7 @@ fn main() {
                     }
 
                     if found_space {
+                        cached_max_y = y + 2;
                         break 'checks;
                     }
 
@@ -124,6 +127,7 @@ fn main() {
                     }
 
                     if found_space {
+                        cached_max_y = y + 1;
                         break 'checks;
                     }
 
@@ -146,6 +150,7 @@ fn main() {
                     }
 
                     if found_space {
+                        cached_max_y = y;
                         break 'checks;
                     }
                 }
