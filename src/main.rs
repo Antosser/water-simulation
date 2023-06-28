@@ -45,7 +45,7 @@ struct Args {
     framerate: u32,
 
     /// Name of the output video
-    #[clap(short = 'n', long, default_value = "out.mov")]
+    #[clap(short = 'n', long, default_value = "out.mp4")]
     filename: String,
 
     /// Whether to use the approximate algorithm (gray will be treated as wall)
