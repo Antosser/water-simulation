@@ -2,13 +2,13 @@
 Simulates how virtual water would flow in a 2d environment
 
 ## Examples
-![maze](https://github.com/Antosser/water-simulation/assets/71790328/7cf2877c-263c-4296-bf68-d158bcc322d6)
+![maze](https://raw.githubusercontent.com/Antosser/water-simulation/master/examples/maze.png)
 
-https://github.com/Antosser/water-simulation/assets/71790328/913ea621-cbc0-4e39-af57-3209f7b3f61d
+https://github.com/Antosser/water-simulation/assets/71790328/1c561ca6-190d-495b-947e-5f4957e772e0
 
-![snail](https://github.com/Antosser/water-simulation/assets/71790328/eeea46e8-d109-4ebe-936f-62ae60223a36)
+![snail](https://raw.githubusercontent.com/Antosser/water-simulation/master/examples/snail.png)
 
-https://github.com/Antosser/water-simulation/assets/71790328/ba4ef345-304a-4b1a-a986-d03725ac542f
+https://github.com/Antosser/water-simulation/assets/71790328/432adb90-d00a-421f-8ed7-dd6bf3d2538f
 
 ## Usage
 ```
@@ -36,3 +36,12 @@ Options:
 ## Requirements
 1. ffmpeg in path
 2. cargo if you want to build yourself
+
+## Installation using GitHub Releases
+1. Download the executable
+2. Run it with the image as an argument
+
+## Installation using Cargo
+1. Install cargo (Rust)
+2. Run `cargo install water-simulation`
+3. Run `water-simulation your_file.png`
