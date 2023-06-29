@@ -4,11 +4,11 @@ Simulates how virtual water would flow in a 2d environment
 ## Examples
 ![maze](https://raw.githubusercontent.com/Antosser/water-simulation/master/examples/maze.png)
 
-https://github.com/Antosser/water-simulation/assets/71790328/1c561ca6-190d-495b-947e-5f4957e772e0
+https://github.com/Antosser/water-simulation/assets/71790328/3446ae80-bf5c-4c0b-8323-9d22f46580c5
 
 ![snail](https://raw.githubusercontent.com/Antosser/water-simulation/master/examples/snail.png)
 
-https://github.com/Antosser/water-simulation/assets/71790328/432adb90-d00a-421f-8ed7-dd6bf3d2538f
+https://github.com/Antosser/water-simulation/assets/71790328/e9278dd7-364a-4835-bd53-4e15381329b4
 
 ## Usage
 ```
