@@ -1,6 +1,8 @@
 use clap::Parser;
 use image::Rgb;
+use itertools::Itertools;
 use log::info;
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use std::{path::PathBuf, process::Command};
 
 enum Cell {
@@ -94,19 +96,36 @@ fn main() {
             'checks: {
                 info!("Frame {}", frame);
                 for y in (0..cached_max_y).rev() {
-                    let mut water_coords = vec![];
+                    // let mut water_coords = vec![];
 
-                    for x in 0..rgb.width() {
-                        let pixel = rgb.get_pixel(x, y);
-                        let cell = match args.approximate {
-                            true => Cell::from_pixel_approximate(pixel).unwrap_or(Cell::Air),
-                            false => Cell::from_pixel(pixel).unwrap_or(Cell::Air),
-                        };
+                    // for x in 0..rgb.width() {
+                    //     let pixel = rgb.get_pixel(x, y);
+                    //     let cell = match args.approximate {
+                    //         true => Cell::from_pixel_approximate(pixel).unwrap_or(Cell::Air),
+                    //         false => Cell::from_pixel(pixel).unwrap_or(Cell::Air),
+                    //     };
 
-                        if let Cell::Water = cell {
-                            water_coords.push((x, y));
-                        }
-                    }
+                    //     if let Cell::Water = cell {
+                    //         water_coords.push((x, y));
+                    //     }
+                    // }
+
+                    let water_coords = (0..rgb.width())
+                        .into_par_iter()
+                        .filter_map(|x| {
+                            let pixel = rgb.get_pixel(x, y);
+                            let cell = match args.approximate {
+                                true => Cell::from_pixel_approximate(pixel).unwrap_or(Cell::Air),
+                                false => Cell::from_pixel(pixel).unwrap_or(Cell::Air),
+                            };
+
+                            if let Cell::Water = cell {
+                                Some((x, y))
+                            } else {
+                                None
+                            }
+                        })
+                        .collect::<Vec<_>>();
 
                     let mut found_space = false;
 
@@ -202,24 +221,20 @@ fn main() {
                     }
                 }
 
-                if true {
-                    // Added because of clippy::never_loop
-                    // Save image
-                    let rgb = rgb.clone();
-                    thread_scope.spawn(move || {
-                        info!("Saving image #{:04}", frame);
-                        rgb.save(format!("images/{:04}.png", frame))
-                            .expect("Failed to save image");
-                    });
+                let rgb = rgb.clone();
+                thread_scope.spawn(move || {
+                    info!("Saving image #{:06}", frame);
+                    rgb.save(format!("images/{:06}.png", frame))
+                        .expect("Failed to save image");
+                });
 
-                    break 'frames;
-                }
+                break 'frames;
             }
             // Save image
             let rgb = rgb.clone();
             thread_scope.spawn(move || {
-                info!("Saving image #{:04}", frame);
-                rgb.save(format!("images/{:04}.png", frame))
+                info!("Saving image #{:06}", frame);
+                rgb.save(format!("images/{:06}.png", frame))
                     .expect("Failed to save image");
             });
         }
@@ -229,20 +244,22 @@ fn main() {
         std::fs::remove_file("output.mp4").expect("Failed to remove output.mp4");
     }
 
-    // ffmpeg -framerate 30 -i images/%04d.png -vf scale=1000x1000:flags=neighbor output.mp4
+    // ffmpeg -framerate 30 -i images/%06d.png -vf scale=1000x1000:flags=neighbor output.mp4
     Command::new("ffmpeg")
         .args([
             "-y",
             "-framerate",
             args.framerate.to_string().as_str(),
             "-i",
-            "images/%04d.png",
+            "images/%06d.png",
             "-vf",
             "scale=1000x1000:flags=neighbor",
             args.filename.as_str(),
         ])
-        .output()
-        .expect("Failed to run ffmpeg");
+        .spawn()
+        .expect("Failed to run ffmpeg")
+        .wait()
+        .unwrap();
 
     std::fs::remove_dir_all("images").expect("Failed to remove images directory");
 }
